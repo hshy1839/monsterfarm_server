@@ -22,13 +22,6 @@ exports.loginAdmin = async (req, res) => {
       });
     }
 
-    if (!user.is_active) {
-      return res.json({
-        loginSuccess: false,
-        message: '승인 대기 중입니다.',
-      });
-    }
-
     if (!['1', '2'].includes(user.user_type)) {
       return res.json({
         loginSuccess: false,
@@ -67,14 +60,6 @@ exports.loginUser = async (req, res) => {
         message: '비밀번호가 틀렸습니다',
       });
     }
-
-    if (!user.is_active) {
-      return res.json({
-        loginSuccess: false,
-        message: '승인 대기 중입니다.',
-      });
-    }
-
 
     const token = jwt.sign(
       { userId: user._id, username: user.username, phoneNumber: user.phoneNumber },
