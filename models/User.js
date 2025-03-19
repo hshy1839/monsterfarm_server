@@ -1,0 +1,51 @@
+const mongoose = require("mongoose");
+const saltRounds = 10;
+const bcrypt = require("bcrypt");
+
+const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    user_type: {type: Int, required: true},
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phoneNumber: { type: String, required: true, unique: true },
+    address: { type: String, required: true },
+    birthdate: { type: Date, required: true },
+    email: { type: String, required: false },
+    cropType: {
+      type: String,
+      enum: ['수도작', '밭작물', '과수', '기타', '농사 짓지 않음'],
+      required: true
+    },
+    customCrop: { type: String, required: false } // 직접 입력한 농작물 이름 저장
+  }, { timestamps: true });
+
+// 비밀번호 암호화
+userSchema.pre("save", function (next) {
+    const user = this;
+    if (user.isModified("password")) {
+        bcrypt.genSalt(saltRounds, function (err, salt) {
+            if (err) return next(err);
+            bcrypt.hash(user.password, salt, function (err, hash) {
+                if (err) return next(err);
+                user.password = hash;
+                next();
+            });
+        });
+    } else {
+        next();
+    }
+});
+
+// 비밀번호 비교 메소드
+userSchema.methods.comparePassword = function (candidatePassword) {
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+            if (err) return reject(err);
+            resolve(isMatch);
+        });
+    });
+};
+
+const User = mongoose.model("User", userSchema);
+
+module.exports = { User };

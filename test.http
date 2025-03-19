@@ -1,0 +1,6 @@
+POST http://localhost:7777/api/users/signup
+Content-Type: application/json
+
+{
+    "name": "홍길동"
+}
