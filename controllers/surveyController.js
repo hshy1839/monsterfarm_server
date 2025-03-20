@@ -26,10 +26,10 @@ exports.createSurvey = async (req, res) => {
         }
 
         // 요청에서 데이터 추출
-        const { name, type, questions } = req.body;
+        const { name, type, questions, isRequired } = req.body;
 
         // 필수 값 검증
-        if (!name || !type || !questions || !Array.isArray(questions)) {
+        if (!name || !type || !questions || !isRequired || !Array.isArray(questions)) {
             return res.status(400).json({ success: false, message: 'name, type, and questions are required' });
         }
 
@@ -43,6 +43,7 @@ exports.createSurvey = async (req, res) => {
         const survey = new Survey({
             name,
             type,
+            isRequired,
             questions: formattedQuestions,
             createdAt: new Date(),
         });

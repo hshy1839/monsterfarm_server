@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const surveySchema = new mongoose.Schema({
   name: { type: String, required: true }, // 설문 제목
   type: { type: String, enum: ["객관식", "주관식"], required: true }, // 설문 타입
+  isRequired: {type: Boolean, required: true},
   questions: [
     {
       questionText: { type: String, required: true }, // 문제 내용

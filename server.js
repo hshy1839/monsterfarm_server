@@ -7,6 +7,7 @@ const connectDB = require('./db');
 
 const userRoutes = require('./routes/userRoutes');
 const surveyRoutes = require('./routes/surveyRoutes');
+const answerRoutes = require('./routes/answerRoutes');
 
 // CORS 설정 (여러 도메인 허용)
 app.use(cors({
@@ -46,3 +47,4 @@ app.use((req, res, next) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api', surveyRoutes);
+app.use('/api', answerRoutes);
