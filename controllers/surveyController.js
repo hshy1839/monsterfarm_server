@@ -156,7 +156,7 @@ exports.deleteSurvey = async (req, res) => {
 // 제품 수정
 exports.updateSurvey = async (req, res) => {
     const { id } = req.params;
-    const { name,} = req.body;
+    const { name,type, questions, createdAt} = req.body;
 
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -172,6 +172,9 @@ exports.updateSurvey = async (req, res) => {
         }
 
         survey.name = name;
+        survey.type = type,
+        survey.questions = questions,
+        survey.createdAt = createdAt;
 
       
 
