@@ -119,3 +119,63 @@ exports.getAnswer = async (req, res) => {
         return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
     }
 };
+
+exports.deleteAnswer = async (req, res) => {
+  const { id } = req.params;
+
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+      return res.status(401).json({ success: false, message: "로그인 정보가 없습니다." });
+  }
+
+  try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+
+      // 1️⃣ 제품 조회
+      const answer = await Answer.findById(id);
+      if (!answer) {
+          return res.status(404).json({ success: false, message: "답변을 찾을 수 없습니다." });
+      }
+      // 4️⃣ 제품 데이터 삭제
+      await Answer.findByIdAndDelete(id);
+
+      return res.status(200).json({ success: true, message: "답변이 삭제되었습니다." });
+  } catch (err) {
+      console.error("❌ 답변 삭제 중 오류 발생:", err);
+      return res.status(500).json({ success: false, message: "서버 오류가 발생했습니다." });
+  }
+};
+
+
+// 제품 수정
+exports.updateAnswer = async (req, res) => {
+  const { id } = req.params;
+  const { userId, answers, createdAt} = req.body;
+
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+      return res.status(401).json({ success: false, message: '로그인 정보가 없습니다.' });
+  }
+
+  try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+
+      const answer = await Answer.findById(id);
+      if (!answer) {
+          return res.status(404).json({ success: false, message: '제품을 찾을 수 없습니다.' });
+      }
+
+      answer.userId = userId;
+      answer.answers = answers,
+      answer.createdAt = createdAt;
+
+    
+
+      await answer.save();
+
+      return res.status(200).json({ success: true, message: '제품이 수정되었습니다.' });
+  } catch (err) {
+      console.error('제품 수정 중 오류 발생:', err);
+      return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+  }
+};
