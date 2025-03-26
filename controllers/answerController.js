@@ -3,54 +3,62 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = 'jm_shoppingmall';
 
 exports.createAnswers = async (req, res) => {
+  console.log('🔥 [createAnswers] 요청 들어옴');
   try {
-    // 🔥 토큰 검증
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
-      return res.status(403).json({ success: false, message: "토큰이 필요합니다." });
+      return res.status(403).json({ success: false, message: 'Token is required' });
     }
 
     let decoded;
     try {
       decoded = jwt.verify(token, JWT_SECRET);
     } catch (err) {
-      return res.status(401).json({ success: false, message: "유효하지 않거나 만료된 토큰입니다." });
+      return res.status(401).json({ success: false, message: 'Invalid or expired token' });
     }
 
     if (!decoded || !decoded.userId) {
-      return res.status(401).json({ success: false, message: "토큰에 userId가 없습니다." });
+      return res.status(401).json({ success: false, message: 'Token does not contain userId' });
     }
 
-    const userId = decoded.userId; // 🔥 토큰에서 유저 ID 가져오기
-    const { surveyId, answers } = req.body;
+    const { answers } = req.body;
 
-    // 🔥 필수 값 검증
-    if (!surveyId || !answers || !Array.isArray(answers) || answers.length === 0) {
-      return res.status(400).json({ success: false, message: "surveyId와 answers가 필요합니다." });
+    if (!answers || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ success: false, message: 'answers are required' });
     }
 
-    // 🔥 answers 배열 검사 (객관식/주관식 유효성 체크)
-    const formattedAnswers = answers.map(answer => ({
-      name: answer.name,
-      selectedOption: answer.selectedOption || "", // 객관식 선택지
-      writtenAnswer: answer.writtenAnswer || "",  // 주관식 응답
-    }));
+    // surveyId가 없는 항목 제거
+    const filteredAnswers = answers.filter(a => a.surveyId);
 
-    // 🔥 응답 저장
-    const newAnswer = new Answer({ surveyId, userId, answers: formattedAnswers });
-    const savedAnswer = await newAnswer.save();
+    if (filteredAnswers.length === 0) {
+      return res.status(400).json({ success: false, message: 'Each answer must include a valid surveyId' });
+    }
+
+    // Answer 문서 생성
+    const answerDoc = new Answer({
+      userId: decoded.userId,
+      answers: filteredAnswers.map(a => ({
+        surveyId: a.surveyId,
+        name: a.name,
+        type: a.type,
+        selectedOption: a.selectedOption || "",
+        writtenAnswer: a.writtenAnswer || "",
+      })),
+    });
+
+    const savedAnswer = await answerDoc.save();
 
     return res.status(200).json({
       success: true,
       message: "응답이 성공적으로 저장되었습니다.",
       answer: savedAnswer,
     });
-  } catch (error) {
-    console.error("응답 저장 오류:", error);
+  } catch (err) {
+    console.error('응답 저장 실패:', err);
     return res.status(500).json({
       success: false,
-      message: "서버 오류 발생",
-      error: error.message,
+      message: '응답 저장 중 오류가 발생했습니다.',
+      error: err.message,
     });
   }
 };

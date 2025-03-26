@@ -36,8 +36,9 @@ exports.createSurvey = async (req, res) => {
         // questions 배열 검사 (객관식일 경우 선택지 필수)
         const formattedQuestions = questions.map(q => ({
             questionText: q.questionText,
-            options: type === "객관식" ? (q.options || []) : [] // 객관식이면 options 필수, 주관식이면 빈 배열
-        }));
+            type: q.type, // ✅ 여기도 추가
+            options: q.options || []
+          }));
 
         // 설문 생성
         const survey = new Survey({
