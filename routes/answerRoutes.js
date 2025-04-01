@@ -15,7 +15,7 @@ const path = require('path');
 router.post('/answers', createAnswers);
 
 router.post('/answers/additional', addtionalAnswers);
-router.get('/answers', getAllAnswers);
+    router.get('/answers', getAllAnswers);
 router.get('/answers/:id', getAnswer);
 router.delete('/answers/:id', deleteAnswer);
 router.put('/answers/:id', updateAnswer);

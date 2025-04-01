@@ -16,6 +16,7 @@ app.use(cors({
       /^http:\/\/localhost(:\d+)?$/,
       /^http:\/\/127\.0\.0\.1(:\d+)?$/,
       /^http:\/\/10\.0\.2\.2(:\d+)?$/,
+      /^http:\/\/54\.180\.98\.3(:\d+)?$/,
     ];
     if (!origin || allowedOrigins.some(regex => regex.test(origin))) {
       callback(null, true);
