@@ -10,29 +10,10 @@ const surveyRoutes = require('./routes/surveyRoutes');
 const answerRoutes = require('./routes/answerRoutes');
 
 // CORS 설정 (여러 도메인 허용)
-const allowedOrigins = [
-  /^http:\/\/localhost(:\d+)?$/,
-  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
-  /^http:\/\/10\.0\.2\.2(:\d+)?$/,
-  /^http:\/\/54\.180\.98\.3(:\d+)?$/,
-  null, // origin이 null인 요청 허용 (Flutter 모바일 등)
-];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (allowedOrigins.some(regex => (typeof regex === 'string' ? regex === origin : regex?.test?.(origin)))) {
-      callback(null, true);
-    } else if (origin === null) {
-      callback(null, true); // null origin 명시적으로 허용
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: true,
   credentials: true,
-  allowedHeaders: 'Content-Type, Authorization',
 }));
-
 
 
 app.use(express.json());
