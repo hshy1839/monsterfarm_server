@@ -4,7 +4,8 @@ const {
     getAllSurvey,
     getSurvey,
     deleteSurvey,
-    updateSurvey
+    updateSurvey,
+    updateSurveyOrder
 
 } = require('../controllers/surveyController');
 
@@ -23,6 +24,7 @@ router.get('/survey/:id', getSurvey);
 // 설문 삭제 (DELETE)
 router.delete('/survey/:id', deleteSurvey);
 router.put('/survey/:id', updateSurvey);
+router.patch('/survey/order', updateSurveyOrder);
 
 
 module.exports = router;

@@ -12,6 +12,7 @@ const surveySchema = new mongoose.Schema({
     }
   ],
   createdAt: { type: Date, default: Date.now },
+  order: Number,
 });
 
 const Survey = mongoose.model("Survey", surveySchema);
