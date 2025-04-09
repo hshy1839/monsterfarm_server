@@ -235,9 +235,10 @@ exports.deleteAnswer = async (req, res) => {
 
 
 // 제품 수정
+// ✅ 수정된 서버 코드
 exports.updateAnswer = async (req, res) => {
   const { id } = req.params;
-  const { userId, answers, createdAt} = req.body;
+  const { answers, createdAt } = req.body;
 
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
@@ -249,20 +250,19 @@ exports.updateAnswer = async (req, res) => {
 
       const answer = await Answer.findById(id);
       if (!answer) {
-          return res.status(404).json({ success: false, message: '제품을 찾을 수 없습니다.' });
+          return res.status(404).json({ success: false, message: '응답을 찾을 수 없습니다.' });
       }
 
-      answer.userId = userId;
-      answer.answers = answers,
-      answer.createdAt = createdAt;
-
-    
+      // 🔥 userId는 기존 값을 유지
+      // answer.userId = answer.userId;
+      answer.answers = answers;
+      if (createdAt) answer.createdAt = createdAt;
 
       await answer.save();
 
-      return res.status(200).json({ success: true, message: '제품이 수정되었습니다.' });
+      return res.status(200).json({ success: true, message: '응답이 수정되었습니다.' });
   } catch (err) {
-      console.error('제품 수정 중 오류 발생:', err);
+      console.error('응답 수정 중 오류 발생:', err);
       return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
   }
 };
