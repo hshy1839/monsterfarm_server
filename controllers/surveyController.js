@@ -29,7 +29,7 @@ exports.createSurvey = async (req, res) => {
         const { name, type, questions, isRequired } = req.body;
 
         // 필수 값 검증
-        if (!name || !type || !questions || !isRequired || !Array.isArray(questions)) {
+        if (!name || !type || !questions ||  typeof isRequired !== 'boolean' || !Array.isArray(questions)) {
             return res.status(400).json({ success: false, message: 'name, type, and questions are required' });
         }
 
@@ -160,7 +160,7 @@ exports.deleteSurvey = async (req, res) => {
 // 제품 수정
 exports.updateSurvey = async (req, res) => {
     const { id } = req.params;
-    const { name,type, questions, createdAt} = req.body;
+    const { name,type, questions,isRequired, createdAt} = req.body;
 
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -177,6 +177,7 @@ exports.updateSurvey = async (req, res) => {
 
         survey.name = name;
         survey.type = type,
+        survey.isRequired = isRequired,
         survey.questions = questions,
         survey.createdAt = createdAt;
 

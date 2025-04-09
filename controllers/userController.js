@@ -206,7 +206,7 @@ exports.getUserInfoByid = async (req, res) => {
 
 //사용자 정보 수정 로직
 exports.updateUserInfo = async (req, res) => {
-  const { name, phoneNumber } = req.body; // 요청 본문에서 업데이트할 데이터 추출
+  const { name, phoneNumber, email,address,cropType, customCrop } = req.body; // 요청 본문에서 업데이트할 데이터 추출
 
   // Authorization 헤더에서 토큰 추출
   const token = req.headers.authorization?.split(' ')[1];
@@ -227,8 +227,11 @@ exports.updateUserInfo = async (req, res) => {
 
     // 업데이트할 필드만 수정
     if (name) user.name = name;
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-
+if (phoneNumber) user.phoneNumber = phoneNumber;
+if (email) user.email = email;
+if (address) user.address = address;
+if (cropType) user.cropType = cropType;
+if (customCrop) user.customCrop = customCrop;
     // 변경 사항 저장
     await user.save();
 

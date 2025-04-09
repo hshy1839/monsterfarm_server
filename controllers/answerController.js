@@ -266,3 +266,24 @@ exports.updateAnswer = async (req, res) => {
       return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
   }
 };
+
+exports.getAnswerMine = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ success: false, message: 'No token' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    const answer = await Answer.findOne({ userId : userId }).sort({ createdAt: -1 }); // 최신 응답
+
+    if (!answer) {
+      return res.status(404).json({ success: false, message: '응답 없음' });
+    }
+
+    res.status(200).json({ success: true, answer });
+  } catch (err) {
+    console.error('내 응답 조회 실패:', err);
+    res.status(500).json({ success: false, message: '서버 오류' });
+  }
+}
