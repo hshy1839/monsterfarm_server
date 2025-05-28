@@ -1,6 +1,7 @@
 const express = require('express');
 const { 
     estimatesUpload,
+    getMyEstimates,
 } = require('../controllers/estimateController');
 
 const router = express.Router();
@@ -23,8 +24,8 @@ router.use((req, res, next) => {
     next();
 });
 // 설문 생성 (POST)
-+ router.post('/estimates', upload.array('images'), estimatesUpload);
-
+router.post('/estimates', upload.array('images'), estimatesUpload);
+router.get('/estimates', getMyEstimates);
 
 
 module.exports = router;
