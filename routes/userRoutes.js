@@ -19,7 +19,7 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'uploads/'); // 저장 경로
+      cb(null, 'uploads/admin/'); // 저장 경로
     },
     filename: (req, file, cb) => {
       cb(null, Date.now() + '_' + file.originalname);
