@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Estimate = require('../models/Estimate'); 
 const JWT_SECRET = 'jm_shoppingmall';
 
+
 exports.estimatesUpload = async (req, res) => {
   console.log('🧾 req.body:', req.body);
   console.log('🖼️ req.files:', req.files);
@@ -21,13 +22,12 @@ exports.estimatesUpload = async (req, res) => {
 
     const userId = decoded.userId;
     const { answerId, manufacturer, price, droneBaseName, items } = req.body;
-    const imageFiles = req.files || [];
 
     if (!answerId || !manufacturer || !price || !items || items.length === 0) {
       return res.status(400).json({ success: false, message: '필수 정보가 누락되었습니다.' });
     }
 
-    const imagePaths = imageFiles.map(file => file.path);
+
 
     const parsedItems = typeof items === 'string' ? JSON.parse(items) : items; // 프론트에서 문자열로 보낼 수 있음
 
@@ -38,7 +38,6 @@ exports.estimatesUpload = async (req, res) => {
       price,
       droneBaseName,
       items: parsedItems,
-      images: imagePaths,
     });
 
     await estimate.save();
@@ -79,6 +78,31 @@ exports.getMyEstimates = async (req, res) => {
       return res.status(200).json({ success: true, estimates });
     } catch (err) {
       console.error('견적서 목록 불러오기 실패:', err);
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
+  
+  exports.getEstimateById = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const estimate = await Estimate.findById(id)
+        .populate({
+          path: 'answerId',
+          populate: {
+            path: 'userId',
+            select: 'name', // 유저 이름만 가져오기
+          },
+        })
+        .lean();
+  
+      if (!estimate) {
+        return res.status(404).json({ success: false, message: '견적서를 찾을 수 없습니다.' });
+      }
+  
+      return res.status(200).json({ success: true, estimate });
+    } catch (err) {
+      console.error('견적서 조회 실패:', err);
       return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
     }
   };

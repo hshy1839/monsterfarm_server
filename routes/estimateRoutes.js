@@ -2,6 +2,7 @@ const express = require('express');
 const { 
     estimatesUpload,
     getMyEstimates,
+    getEstimateById,
 } = require('../controllers/estimateController');
 
 const router = express.Router();
@@ -26,6 +27,7 @@ router.use((req, res, next) => {
 // 설문 생성 (POST)
 router.post('/estimates', upload.array('images'), estimatesUpload);
 router.get('/estimates', getMyEstimates);
+router.get('/estimates/detail/:id', getEstimateById);
 
 
 module.exports = router;
