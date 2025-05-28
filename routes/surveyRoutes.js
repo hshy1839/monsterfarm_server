@@ -5,7 +5,8 @@ const {
     getSurvey,
     deleteSurvey,
     updateSurvey,
-    updateSurveyOrder
+    updateSurveyOrder,
+    getSurveyById,
 
 } = require('../controllers/surveyController');
 
@@ -19,7 +20,8 @@ router.post('/survey', createSurvey);
 router.get('/survey', getAllSurvey);
 
 // 특정 설문 조회 (GET)
-router.get('/survey/:id', getSurvey);
+router.get('/survey/mine', getSurvey);
+router.get('/survey/:id', getSurveyById);
 
 // 설문 삭제 (DELETE)
 router.delete('/survey/:id', deleteSurvey);

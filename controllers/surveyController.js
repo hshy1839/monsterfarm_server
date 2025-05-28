@@ -96,39 +96,46 @@ exports.getAllSurvey = async (req, res) => {
       res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
     }
   };
-
-
-exports.getSurvey = async (req, res) => {
-    const { id } = req.params;
-
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        console.error('유효하지 않은 설문 ID:', id);
-        return res.status(400).json({ success: false, message: '유효하지 않은 설문 ID입니다.' });
-    }
-
+  exports.getSurveyById = async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            console.error('토큰 누락: 인증 실패');
-            return res.status(401).json({ success: false, message: '로그인 정보가 없습니다.' });
-        }
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-
-        const survey = await Survey.findById(id);
-        if (!survey) {
-            console.error('설문 없음:', id);
-            return res.status(404).json({ success: false, message: '제품을 찾을 수 없습니다.' });
-        }
-
-        return res.status(200).json({ success: true, survey });
-
+      const { id } = req.params;
+  
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, message: '유효하지 않은 설문 ID입니다.' });
+      }
+  
+      const survey = await Survey.findById(id);
+  
+      if (!survey) {
+        return res.status(404).json({ success: false, message: '설문을 찾을 수 없습니다.' });
+      }
+  
+      return res.status(200).json({ success: true, survey });
     } catch (err) {
-        console.error('제품 조회 중 오류:', err);
-        return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+      console.error('설문 조회 중 오류:', err);
+      return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
     }
-};
+  };
+  
+
+  exports.getSurvey = async (req, res) => {
+    try {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) {
+        return res.status(401).json({ success: false, message: '로그인 정보가 없습니다.' });
+      }
+  
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.id;
+  
+      const surveys = await Survey.find({ userId }).sort({ createdAt: -1 });
+  
+      return res.status(200).json({ success: true, surveys });
+    } catch (err) {
+      console.error('내 설문 조회 중 오류:', err);
+      return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+    }
+  };
 
 exports.deleteSurvey = async (req, res) => {
     const { id } = req.params;

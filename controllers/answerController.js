@@ -275,15 +275,16 @@ exports.getAnswerMine = async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
 
-    const answer = await Answer.findOne({ userId : userId }).sort({ createdAt: -1 }); // 최신 응답
+    console.log('✅ 디코딩된 userId:', userId);
 
-    if (!answer) {
-      return res.status(404).json({ success: false, message: '응답 없음' });
-    }
+    // ✅ ObjectId로 변환하여 정확히 비교
+    const answers = await Answer.find({ userId: new mongoose.Types.ObjectId(userId) }).sort({ createdAt: -1 });
 
-    res.status(200).json({ success: true, answer });
+    console.log('📦 유저 응답 조회 결과:', answers);
+
+    res.status(200).json({ success: true, answers });
   } catch (err) {
-    console.error('내 응답 조회 실패:', err);
+    console.error('❌ 내 응답 조회 실패:', err);
     res.status(500).json({ success: false, message: '서버 오류' });
-  }
-}
+  }  
+};
