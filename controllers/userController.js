@@ -29,9 +29,15 @@ exports.loginAdmin = async (req, res) => {
       });
     }
     
+    if (user.is_active === false) {
+      return res.json({
+        loginSuccess: false,
+        message: '승인 대기 중인 계정입니다.',
+      });
+    }
 
     const token = jwt.sign(
-      { userId: user._id, username: user.username, phoneNumber: user.phoneNumber },
+      { userId: user._id, username: user.username, phoneNumber: user.phoneNumber, user_type: user.user_type, },
       JWT_SECRET,
       { expiresIn: '48h' }
     );
@@ -95,6 +101,46 @@ exports.signupUser = async (req, res) => {
     return res.status(500).json({ success: false, err });
   }
 };
+
+exports.signupAdmin = async (req, res) => {
+  try {
+    const {
+      username,
+      password,
+      name,
+      email,
+      phoneNumber,
+      address,
+      birthdate,
+    } = req.body;
+
+    const businessRegFilePath = req.files?.businessRegFile?.[0]?.path || '';
+    const bankCopyFilePath = req.files?.bankCopyFile?.[0]?.path || '';
+
+    const user = new User({
+      username,
+      password,
+      name,
+      phoneNumber,
+      email,
+      address,
+      birthdate,
+      user_type: '2',
+      is_active: false,
+      businessRegistrationFile: businessRegFilePath,
+      bankbookFile: bankCopyFilePath,
+    });
+
+    await user.save();
+
+    return res.status(200).json({ success: true, message: '회원가입 신청 완료' });
+  } catch (err) {
+    console.error('관리자 회원가입 실패:', err);
+    return res.status(500).json({ success: false, message: '회원가입 실패', error: err.message });
+  }
+};
+
+
 
 //모든 유저 정보 조회
 exports.getAllUsersInfo = async (req, res) => {
@@ -163,38 +209,44 @@ exports.getUserInfo = async (req, res) => {
 
 //아이디를 통한 특정 유저 조회
 exports.getUserInfoByid = async (req, res) => {
-  const { id } = req.params; // URL 파라미터에서 유저 ID 가져오기
+  const { id } = req.params;
 
-  // Authorization 헤더에서 토큰 추출
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ success: false, message: '로그인 정보가 없습니다.' });
   }
 
   try {
-    // JWT 검증 및 디코딩
     const decoded = jwt.verify(token, JWT_SECRET);
-    const requestorId = decoded.userId; // 토큰에서 요청자의 ID 가져오기
+    const requestorId = decoded.userId;
 
-    // `id`가 유효한 ObjectId인지 확인
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ success: false, message: '유효하지 않은 유저 ID입니다.' });
     }
 
-    // 데이터베이스에서 유저 정보 검색
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ success: false, message: '유저를 찾을 수 없습니다.' });
     }
 
-    // 유저 정보 반환
     res.status(200).json({
       success: true,
       user: {
+        _id: user._id,
+        username: user.username,
         name: user.name,
         phoneNumber: user.phoneNumber,
         email: user.email,
-        username: user.username,
+        birthdate: user.birthdate,
+        address: user.address,
+        cropType: user.cropType,
+        customCrop: user.customCrop,
+        user_type: user.user_type,
+        is_active: user.is_active,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        businessRegistrationFile: user.businessRegistrationFile,
+        bankbookFile: user.bankbookFile
       },
     });
   } catch (err) {

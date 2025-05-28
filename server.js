@@ -9,6 +9,9 @@ const userRoutes = require('./routes/userRoutes');
 const surveyRoutes = require('./routes/surveyRoutes');
 const answerRoutes = require('./routes/answerRoutes');
 
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // CORS 설정 (여러 도메인 허용)
 app.use(cors({
   origin: true,

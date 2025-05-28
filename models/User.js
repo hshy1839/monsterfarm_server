@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    user_type: {type: String, default: "3"},
+    user_type: { type: String, default: "3" },
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true, unique: true },
@@ -14,10 +14,17 @@ const userSchema = new mongoose.Schema({
     cropType: {
       type: String,
       enum: ['수도작', '밭작물', '과수', '기타', '농사 짓지 않음'],
-      required: true
+      required: false
     },
-    customCrop: { type: String, required: false } // 직접 입력한 농작물 이름 저장
+    customCrop: { type: String, required: false },
+  
+    // ✅ 사업자 정보 관련 필드 추가
+    companyName: { type: String, required: false },              // 회사명
+    businessRegistrationFile: { type: String, required: false }, // 사업자등록증 파일 경로
+    bankbookFile: { type: String, required: false },              // 통장 사본 파일 경로,
+    is_active : {type:Boolean, default: true}
   }, { timestamps: true });
+  
 
 // 비밀번호 암호화
 userSchema.pre("save", function (next) {
