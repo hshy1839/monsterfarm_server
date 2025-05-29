@@ -107,3 +107,20 @@ exports.getMyEstimates = async (req, res) => {
     }
   };
   
+  exports.getEstimatesByAnswerId = async (req, res) => {
+    try {
+      const { answerId } = req.params;
+      const estimates = await Estimate.find({ answerId })
+        .populate({
+          path: 'answerId',
+          populate: { path: 'userId', select: 'name' },
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+  
+      return res.status(200).json({ success: true, estimates });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
+  
