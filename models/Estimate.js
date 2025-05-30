@@ -17,6 +17,7 @@ answerId: { type: Schema.Types.ObjectId, ref: 'Answer', required: true },
   items: [estimateItemSchema],                             // 항목들
   selectedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   createdAt: { type: Date, default: Date.now },
+  is_selected: {type: Boolean, default: false},
 });
 
 module.exports = mongoose.model('Estimate', estimateSchema);

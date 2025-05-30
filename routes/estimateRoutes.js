@@ -4,6 +4,8 @@ const {
     getMyEstimates,
     getEstimateById,
     getEstimatesByAnswerId,
+    selectEstimate,
+    getAllEstimates,
 } = require('../controllers/estimateController');
 
 const router = express.Router();
@@ -30,6 +32,8 @@ router.post('/estimates', upload.array('images'), estimatesUpload);
 router.get('/estimates', getMyEstimates);
 router.get('/estimates/detail/:id', getEstimateById);
 router.get('/estimates/by-answer/:answerId', getEstimatesByAnswerId);
+router.post('/estimates/select',  selectEstimate);
+router.get('/estimates/all', getAllEstimates);
 
 
 module.exports = router;

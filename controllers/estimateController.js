@@ -73,6 +73,7 @@ exports.getMyEstimates = async (req, res) => {
           select: 'name', // 유저의 이름만 가져오기
         }
       })
+      .populate({ path: 'uploadedBy', select: 'name' })
       .sort({ createdAt: -1 })
       .lean();
       return res.status(200).json({ success: true, estimates });
@@ -94,6 +95,7 @@ exports.getMyEstimates = async (req, res) => {
             select: 'name', // 유저 이름만 가져오기
           },
         })
+        .populate({ path: 'uploadedBy', select: 'name' })
         .lean();
   
       if (!estimate) {
@@ -120,6 +122,68 @@ exports.getMyEstimates = async (req, res) => {
   
       return res.status(200).json({ success: true, estimates });
     } catch (err) {
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
+  
+  exports.selectEstimate = async (req, res) => {
+    try {
+      const token = req.headers['authorization']?.split(' ')[1];
+      if (!token) {
+        return res.status(403).json({ success: false, message: '토큰이 필요합니다.' });
+      }
+  
+      let decoded;
+      try {
+        decoded = jwt.verify(token, JWT_SECRET);
+      } catch (err) {
+        return res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });
+      }
+  
+      const userId = decoded.userId;
+      const { estimateId } = req.body;
+  
+      if (!estimateId) {
+        return res.status(400).json({ success: false, message: 'estimateId가 필요합니다.' });
+      }
+  
+      const estimate = await Estimate.findById(estimateId);
+      if (!estimate) {
+        return res.status(404).json({ success: false, message: '견적서를 찾을 수 없습니다.' });
+      }
+  
+      // 이미 선택된 경우 방지 로직(선택된 견적서가 존재할 경우 제거하거나 선택 불가 처리 가능)
+      await Estimate.updateMany(
+        { answerId: estimate.answerId },
+        { $set: { is_selected: false, selectedBy: null } }
+      );
+  
+      estimate.is_selected = true;
+      estimate.selectedBy = userId;
+  
+      await estimate.save();
+  
+      return res.status(200).json({ success: true, message: '견적서가 선택되었습니다.', estimate });
+    } catch (err) {
+      console.error('견적 선택 실패:', err);
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
+  
+  exports.getAllEstimates = async (req, res) => {
+    try {
+      const estimates = await Estimate.find()
+        .populate({
+          path: 'answerId',
+          populate: { path: 'userId', select: 'name' },
+        })
+        .populate({ path: 'uploadedBy', select: 'name' })
+        .sort({ createdAt: -1 })
+        .lean();
+  
+      return res.status(200).json({ success: true, estimates });
+    } catch (err) {
+      console.error('전체 견적 조회 실패:', err);
       return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
     }
   };
