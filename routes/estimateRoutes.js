@@ -8,6 +8,7 @@ const {
     getAllEstimates,
     deleteEstimateById,
     approveEstimateById,
+    getMyEstimateCountByAnswerId,
 } = require('../controllers/estimateController');
 
 const router = express.Router();
@@ -39,5 +40,5 @@ router.get('/estimates/all', getAllEstimates);
 
 router.patch('/estimates/:id/approve',  approveEstimateById);
 router.delete('/estimates/:id', deleteEstimateById);
-
+router.get('/estimates/my/count/:answerId', getMyEstimateCountByAnswerId);
 module.exports = router;

@@ -248,3 +248,26 @@ exports.getMyEstimates = async (req, res) => {
     }
   };
   
+  exports.getMyEstimateCountByAnswerId = async (req, res) => {
+    try {
+      const token = req.headers['authorization']?.split(' ')[1];
+      if (!token) {
+        return res.status(403).json({ success: false, message: '토큰이 필요합니다.' });
+      }
+  
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.userId;
+      const { answerId } = req.params;
+  
+      const count = await Estimate.countDocuments({
+        uploadedBy: userId,
+        answerId,
+      });
+  
+      return res.status(200).json({ success: true, count });
+    } catch (err) {
+      console.error('특정 응답의 견적서 개수 조회 실패:', err);
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
+  
