@@ -18,6 +18,7 @@ answerId: { type: Schema.Types.ObjectId, ref: 'Answer', required: true },
   selectedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   createdAt: { type: Date, default: Date.now },
   is_selected: {type: Boolean, default: false},
+  is_approved: {type: Boolean, default: false},
 });
 
 module.exports = mongoose.model('Estimate', estimateSchema);

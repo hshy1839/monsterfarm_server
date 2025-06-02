@@ -6,6 +6,8 @@ const {
     getEstimatesByAnswerId,
     selectEstimate,
     getAllEstimates,
+    deleteEstimateById,
+    approveEstimateById,
 } = require('../controllers/estimateController');
 
 const router = express.Router();
@@ -35,5 +37,7 @@ router.get('/estimates/by-answer/:answerId', getEstimatesByAnswerId);
 router.post('/estimates/select',  selectEstimate);
 router.get('/estimates/all', getAllEstimates);
 
+router.patch('/estimates/:id/approve',  approveEstimateById);
+router.delete('/estimates/:id', deleteEstimateById);
 
 module.exports = router;

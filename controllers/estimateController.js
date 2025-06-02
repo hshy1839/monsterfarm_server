@@ -187,4 +187,64 @@ exports.getMyEstimates = async (req, res) => {
       return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
     }
   };
+
+  exports.deleteEstimateById = async (req, res) => {
+    try {
+      const token = req.headers['authorization']?.split(' ')[1];
+      if (!token) {
+        return res.status(403).json({ success: false, message: '토큰이 필요합니다.' });
+      }
+  
+      let decoded;
+      try {
+        decoded = jwt.verify(token, JWT_SECRET);
+      } catch (err) {
+        return res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });
+      }
+  
+      const { id } = req.params;
+  
+      const estimate = await Estimate.findById(id);
+      if (!estimate) {
+        return res.status(404).json({ success: false, message: '견적서를 찾을 수 없습니다.' });
+      }
+  
+      await Estimate.findByIdAndDelete(id);
+  
+      return res.status(200).json({ success: true, message: '견적서가 삭제되었습니다.' });
+    } catch (err) {
+      console.error('견적서 삭제 실패:', err);
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
+  
+  exports.approveEstimateById = async (req, res) => {
+    try {
+      const token = req.headers['authorization']?.split(' ')[1];
+      if (!token) {
+        return res.status(403).json({ success: false, message: '토큰이 필요합니다.' });
+      }
+  
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const { id } = req.params;
+      const { is_approved } = req.body;
+  
+      if (typeof is_approved !== 'boolean') {
+        return res.status(400).json({ success: false, message: 'is_approved 값이 필요합니다 (true 또는 false).' });
+      }
+  
+      const estimate = await Estimate.findById(id);
+      if (!estimate) {
+        return res.status(404).json({ success: false, message: '견적서를 찾을 수 없습니다.' });
+      }
+  
+      estimate.is_approved = is_approved;
+      await estimate.save();
+  
+      return res.status(200).json({ success: true, message: '승인 상태가 변경되었습니다.', estimate });
+    } catch (err) {
+      console.error('승인 상태 변경 실패:', err);
+      return res.status(500).json({ success: false, message: '서버 오류', error: err.message });
+    }
+  };
   
