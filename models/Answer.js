@@ -12,7 +12,14 @@ const answerSchema = new mongoose.Schema({
     }
   ],
   createdAt: { type: Date, default: Date.now }, // 응답 제출 시간
+  expiresAt: {                                      // ✅ 7일 후 만료일
+    type: Date,
+    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 현재 시간 + 7일
+  }
 });
+
+// ✅ TTL 인덱스 설정 (expiresAt 기준으로 문서 자동 삭제)
+answerSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const Answer = mongoose.model("Answer", answerSchema);
 

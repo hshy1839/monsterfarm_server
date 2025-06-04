@@ -175,11 +175,31 @@ exports.getMyEstimates = async (req, res) => {
       const estimates = await Estimate.find()
         .populate({
           path: 'answerId',
-          populate: { path: 'userId', select: 'name' },
+          populate: [
+            { path: 'userId', select: 'name' }
+          ]
         })
         .populate({ path: 'uploadedBy', select: 'name' })
         .sort({ createdAt: -1 })
         .lean();
+  
+      // ✅ Answer.answers에서 지역 정보 추출
+      for (const est of estimates) {
+        const answer = est.answerId;
+      
+        if (answer?.answers && Array.isArray(answer.answers)) {
+          const regionAnswer = answer.answers.find(ans =>
+            ans.name?.includes('A/S') && (ans.selectedOption || ans.writtenAnswer)
+          );
+      
+          // 선택지 > 주관식 > 미입력 순
+          est.region = regionAnswer?.selectedOption || regionAnswer?.writtenAnswer || '미입력';
+        } else {
+          est.region = '미입력';
+        }
+      }
+      
+      
   
       return res.status(200).json({ success: true, estimates });
     } catch (err) {
