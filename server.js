@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userRoutes');
 const surveyRoutes = require('./routes/surveyRoutes');
 const answerRoutes = require('./routes/answerRoutes');
 const estimateRoutes = require('./routes/estimateRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -37,3 +38,4 @@ app.use('/api/users', userRoutes);
 app.use('/api', surveyRoutes);
 app.use('/api', answerRoutes);
 app.use('/api', estimateRoutes);
+app.use('/api', reservationRoutes);
