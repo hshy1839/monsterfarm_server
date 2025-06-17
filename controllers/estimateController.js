@@ -117,6 +117,10 @@ exports.getMyEstimates = async (req, res) => {
           path: 'answerId',
           populate: { path: 'userId', select: 'name' },
         })
+        .populate({
+          path: 'uploadedBy',
+          select: 'companyName' // ⭐ 여기 중요
+        })
         .sort({ createdAt: -1 })
         .lean();
   

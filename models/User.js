@@ -4,12 +4,13 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    companyName: {type:String, },
     user_type: { type: String, default: "3" },
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true, unique: true },
     address: { type: String, required: true },
-    birthdate: { type: Date, required: true },
+    birthdate: { type: Date },
     email: { type: String, required: false },
     cropType: {
       type: String,
@@ -17,7 +18,7 @@ const userSchema = new mongoose.Schema({
       required: false
     },
     customCrop: { type: String, required: false },
-  
+    businessNumber:{type: String},
     // ✅ 사업자 정보 관련 필드 추가
     companyName: { type: String, required: false },              // 회사명
     businessRegistrationFile: { type: String, required: false }, // 사업자등록증 파일 경로

@@ -16,6 +16,7 @@ const {
 const multer = require('multer');
 const fs = require('fs');
 const router = express.Router();
+const path = require('path');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -55,15 +56,23 @@ router.put('/userinfoUpdate', updateUserInfo );
 //유저 삭제
 router.delete('/userinfo/:id', deleteUser );
 
-router.get('/download/:filename', (req, res) => {
-    const { filename } = req.params;
-    const filePath = path.join(__dirname, '../uploads', filename);
-  
-    if (fs.existsSync(filePath)) {
-      res.download(filePath); // 📥 Content-Disposition: attachment 자동 설정됨
-    } else {
-      res.status(404).send('파일을 찾을 수 없습니다.');
-    }
-  });
+router.get('/download/:type/:filename', (req, res) => {
+  const { type, filename } = req.params;
+
+  let folder = '';
+  if (type === 'business' || type === 'bank') {
+    folder = 'admin';
+  } else {
+    return res.status(400).send('잘못된 요청입니다.');
+  }
+
+  const filePath = path.join(__dirname, `../uploads/${folder}/${filename}`);
+
+  if (fs.existsSync(filePath)) {
+    res.download(filePath);
+  } else {
+    res.status(404).send('파일을 찾을 수 없습니다.');
+  }
+});
 
 module.exports = router;

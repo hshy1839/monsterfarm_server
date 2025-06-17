@@ -16,6 +16,11 @@ const reservationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  answer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Answer',
+    required: true
+  }
 });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

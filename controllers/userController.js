@@ -25,7 +25,7 @@ exports.loginAdmin = async (req, res) => {
     if (!['1', '2'].includes(user.user_type)) {
       return res.json({
         loginSuccess: false,
-        message: '관리자 또는 부관리자가 아닙니다.',
+        message: '관리자 또는 대리점이 아닙니다.',
       });
     }
     
@@ -108,10 +108,12 @@ exports.signupAdmin = async (req, res) => {
       username,
       password,
       name,
+      companyName,
       email,
       phoneNumber,
       address,
       birthdate,
+      businessNumber,
     } = req.body;
 
     const businessRegFilePath = req.files?.businessRegFile?.[0]?.path || '';
@@ -121,10 +123,12 @@ exports.signupAdmin = async (req, res) => {
       username,
       password,
       name,
+      companyName,
       phoneNumber,
       email,
       address,
       birthdate,
+      businessNumber,
       user_type: '2',
       is_active: false,
       businessRegistrationFile: businessRegFilePath,
@@ -241,6 +245,7 @@ exports.getUserInfoByid = async (req, res) => {
         address: user.address,
         cropType: user.cropType,
         customCrop: user.customCrop,
+        businessNumber: user.businessNumber,
         user_type: user.user_type,
         is_active: user.is_active,
         createdAt: user.createdAt,

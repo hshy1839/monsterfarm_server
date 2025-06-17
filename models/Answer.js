@@ -19,7 +19,6 @@ const answerSchema = new mongoose.Schema({
 });
 
 // ✅ TTL 인덱스 설정 (expiresAt 기준으로 문서 자동 삭제)
-answerSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const Answer = mongoose.model("Answer", answerSchema);
 
